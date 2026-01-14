@@ -1,50 +1,40 @@
-const BASE_URL = "http://localhost:8080/api/auth";
+// ===============================
+// BACKEND BASE URL (LIVE)
+// ===============================
+const API_BASE_URL = "https://mis-ims-project.onrender.com";
 
-// REGISTER
-async function registerUser() {
-    const data = {
-        fullName: document.getElementById("fullName").value,
-        email: document.getElementById("email").value,
-        password: document.getElementById("password").value,
-        role: "USER"
-    };
-
-    const response = await fetch(`${BASE_URL}/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-    });
-
-    const result = await response.text();
-    alert(result);
-
-    if (response.ok) {
-        window.location.href = "login.html";
-    }
-}
-
+// ===============================
 // LOGIN
+// ===============================
 async function loginUser(event) {
     event.preventDefault();
 
-    const data = {
-        email: document.getElementById("loginEmail").value,
-        password: document.getElementById("loginPassword").value
-    };
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
 
-    const response = await fetch("http://localhost:8080/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-    });
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            credentials: "include", // VERY IMPORTANT for session
+            body: JSON.stringify({
+                email: email,
+                password: password
+            })
+        });
 
-    if (response.ok) {
-        // SESSION START
-        localStorage.setItem("isLoggedIn", "true");
+        if (!response.ok) {
+            alert("Invalid email or password");
+            return;
+        }
 
-        alert("Login successful");
-        window.location.href = "dashboard.html";
-    } else {
-        alert("Invalid email or password");
-    }
-}
+        const data = await response.json();
+
+        // Save session info (optional but useful)
+        localStorage.setItem("userRole", data.role);
+        localStorage.setItem("userEmail", data.email);
+
+        // Redirect to dashboard
+        window.location.hre
