@@ -1,11 +1,6 @@
-// ===============================
-// BACKEND BASE URL (LIVE)
-// ===============================
-const API_BASE_URL = "https://mis-ims-project.onrender.com";
+const API_BASE_URL = "https://mis-ims-project.onrender.com"; 
+// change if your backend URL is different
 
-// ===============================
-// LOGIN
-// ===============================
 async function loginUser(event) {
     event.preventDefault();
 
@@ -18,11 +13,7 @@ async function loginUser(event) {
             headers: {
                 "Content-Type": "application/json"
             },
-            credentials: "include", // VERY IMPORTANT for session
-            body: JSON.stringify({
-                email: email,
-                password: password
-            })
+            body: JSON.stringify({ email, password })
         });
 
         if (!response.ok) {
@@ -32,9 +23,12 @@ async function loginUser(event) {
 
         const data = await response.json();
 
-        // Save session info (optional but useful)
-        localStorage.setItem("userRole", data.role);
-        localStorage.setItem("userEmail", data.email);
+        localStorage.setItem("token", data.token);
 
-        // Redirect to dashboard
-        window.location.hre
+        window.location.href = "dashboard.html";
+
+    } catch (error) {
+        console.error("Login error:", error);
+        alert("Server error. Please try again later.");
+    }
+}
