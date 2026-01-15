@@ -10,30 +10,29 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
-    // ✅ Password encoder (required for AuthController)
+    // ✅ REQUIRED for AuthController (this fixes your crash)
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // ✅ Main security configuration
+    // ✅ Security rules
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-            // ❌ Disable CSRF (needed for frontend → backend POST)
+            // Disable CSRF for frontend requests
             .csrf(csrf -> csrf.disable())
 
-            // ✅ Authorization rules
+            // Authorization rules
             .authorizeHttpRequests(auth -> auth
-
-                // ✅ Render health check
+                // Render health check
                 .requestMatchers("/actuator/health").permitAll()
 
-                // ✅ Auth APIs
+                // Auth APIs
                 .requestMatchers("/api/auth/**").permitAll()
 
-                // ❌ Everything else secured
+                // Everything else protected
                 .anyRequest().authenticated()
             );
 
