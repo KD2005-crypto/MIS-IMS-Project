@@ -1,7 +1,10 @@
 package com.mis.auth.dto;
 
+import lombok.Data;
+
+@Data
 public class RegisterRequest {
-    public String fullName;
-    public String email;
-    public String password;
+    private String fullName;
+    private String email;
+    private String password;
 }

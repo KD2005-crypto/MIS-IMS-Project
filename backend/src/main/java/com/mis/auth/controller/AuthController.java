@@ -1,8 +1,9 @@
 package com.mis.auth.controller;
 
+import com.mis.auth.dto.LoginRequest;
+import com.mis.auth.dto.RegisterRequest;
 import com.mis.auth.entity.User;
 import com.mis.auth.repository.UserRepository;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,31 +13,38 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public AuthController(UserRepository userRepository) {
+    public AuthController(UserRepository userRepository,
+                          BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user) {
+    public String register(@RequestBody RegisterRequest request) {
 
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            return ResponseEntity.badRequest().body("Email already exists");
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            return "EMAIL_EXISTS";
         }
 
-        user.setPasswordHash(encoder.encode(user.getPasswordHash()));
-        userRepository.save(user);
+        User user = new User();
+        user.setFullName(request.getFullName());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole("USER");
+        user.setStatus("ACTIVE");
 
-        return ResponseEntity.ok("User registered successfully");
+        userRepository.save(user);
+        return "REGISTERED";
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User request) {
+    public String login(@RequestBody LoginRequest request) {
 
         return userRepository.findByEmail(request.getEmail())
-                .filter(u -> encoder.matches(request.getPasswordHash(), u.getPasswordHash()))
-                .map(u -> ResponseEntity.ok("Login successful"))
-                .orElse(ResponseEntity.status(401).body("Invalid credentials"));
+                .filter(u -> passwordEncoder.matches(request.getPassword(), u.getPassword()))
+                .map(u -> "LOGIN_SUCCESS")
+                .orElse("INVALID_CREDENTIALS");
     }
 }

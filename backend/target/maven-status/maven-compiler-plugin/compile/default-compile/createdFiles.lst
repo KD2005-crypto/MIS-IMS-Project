@@ -5,4 +5,3 @@ com\mis\auth\AuthApplication.class
 com\mis\auth\config\SecurityConfig.class
 com\mis\auth\dto\RegisterRequest.class
 com\mis\auth\entity\User.class
-com\mis\auth\entity\User$Status.class
