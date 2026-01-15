@@ -1,73 +1,42 @@
 package com.mis.auth.controller;
 
-import com.mis.auth.dto.LoginRequest;
-import com.mis.auth.dto.RegisterRequest;
 import com.mis.auth.entity.User;
 import com.mis.auth.repository.UserRepository;
-
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import java.util.Map;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin
+@CrossOrigin(origins = "*")
 public class AuthController {
 
-    private final UserRepository userRepo;
-    private final BCryptPasswordEncoder encoder;
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-    public AuthController(UserRepository userRepo,
-                          BCryptPasswordEncoder encoder) {
-        this.userRepo = userRepo;
-        this.encoder = encoder;
+    public AuthController(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
-    // REGISTER
     @PostMapping("/register")
-    public String register(@RequestBody RegisterRequest req) {
+    public ResponseEntity<?> register(@RequestBody User user) {
 
-        if (userRepo.findByEmail(req.email).isPresent()) {
-            return "Email already exists";
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            return ResponseEntity.badRequest().body("Email already exists");
         }
 
-        User user = new User();
-        user.setFull_name(req.fullName);
-        user.setEmail(req.email);
-        user.setPassword_hash(encoder.encode(req.password));
-        user.setRole(req.role);
+        user.setPasswordHash(encoder.encode(user.getPasswordHash()));
+        userRepository.save(user);
 
-        userRepo.save(user);
-        return "Registered successfully";
+        return ResponseEntity.ok("User registered successfully");
     }
 
-    // LOGIN
     @PostMapping("/login")
-    public Map<String, String> login(@RequestBody LoginRequest req) {
+    public ResponseEntity<?> login(@RequestBody User request) {
 
-        User user = userRepo.findByEmail(req.email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        if (!encoder.matches(req.password, user.getPassword_hash())) {
-            throw new RuntimeException("Invalid credentials");
-        }
-
-        return Map.of(
-                "message", "Login successful",
-                "role", user.getRole()
-        );
-    }
-
-    // FORGOT PASSWORD
-    @PostMapping("/forgot-password")
-    public String forgotPassword() {
-        return "Reset link sent to email";
-    }
-
-    // RESET PASSWORD
-    @PostMapping("/reset-password")
-    public String resetPassword() {
-        return "Password reset successful";
+        return userRepository.findByEmail(request.getEmail())
+                .filter(u -> encoder.matches(request.getPasswordHash(), u.getPasswordHash()))
+                .map(u -> ResponseEntity.ok("Login successful"))
+                .orElse(ResponseEntity.status(401).body("Invalid credentials"));
     }
 }

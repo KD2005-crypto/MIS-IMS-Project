@@ -9,47 +9,77 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int user_id;
+    private Long id;
 
     @Column(nullable = false)
-    private String full_name;
+    private String fullName;
 
     @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
-    private String password_hash;
+    private String passwordHash;
 
     @Column(nullable = false)
     private String role;
 
-    @Enumerated(EnumType.STRING)
-    private Status status = Status.active;
+    @Column(nullable = false)
+    private Boolean status = true;
 
-    private LocalDateTime created_at = LocalDateTime.now();
+    @Column(nullable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    public enum Status {
-        active, inactive
+    // ---- getters & setters ----
+
+    public Long getId() {
+        return id;
     }
 
-    // Getters and Setters
-    public int getUser_id() { return user_id; }
-    public void setUser_id(int user_id) { this.user_id = user_id; }
+    public String getFullName() {
+        return fullName;
+    }
 
-    public String getFull_name() { return full_name; }
-    public void setFull_name(String full_name) { this.full_name = full_name; }
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getPassword_hash() { return password_hash; }
-    public void setPassword_hash(String password_hash) { this.password_hash = password_hash; }
+    public String getEmail() {
+        return email;
+    }
+    
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+    
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
 
-    public Status getStatus() { return status; }
-    public void setStatus(Status status) { this.status = status; }
+    public String getRole() {
+        return role;
+    }
+    
+    public void setRole(String role) {
+        this.role = role;
+    }
 
-    public LocalDateTime getCreated_at() { return created_at; }
+    public Boolean getStatus() {
+        return status;
+    }
+    
+    public void setStatus(Boolean status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 }
