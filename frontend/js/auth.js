@@ -1,6 +1,11 @@
-const API_BASE_URL = "https://mis-ims-project.onrender.com";
+// ================================
+// CONFIG
+// ================================
+const API_BASE_URL = "https://mis-ims-project-1.onrender.com";
 
-// ---------------- LOGIN ----------------
+// ================================
+// LOGIN
+// ================================
 async function loginUser(event) {
     event.preventDefault();
 
@@ -16,22 +21,28 @@ async function loginUser(event) {
             body: JSON.stringify({ email, password })
         });
 
+        if (!response.ok) {
+            alert("Invalid email or password");
+            return;
+        }
+
         const data = await response.json();
 
-        if (response.ok) {
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("role", data.role);
-            window.location.href = "dashboard.html";
-        } else {
-            alert(data.message || "Invalid credentials");
-        }
+        // Save session
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("role", data.role);
+
+        window.location.href = "dashboard.html";
+
     } catch (error) {
         console.error(error);
         alert("Backend not reachable");
     }
 }
 
-// ---------------- REGISTER ----------------
+// ================================
+// REGISTER
+// ================================
 async function registerUser(event) {
     event.preventDefault();
 
@@ -53,16 +64,24 @@ async function registerUser(event) {
             })
         });
 
-        const data = await response.json();
-
-        if (response.ok) {
-            alert("Registration successful. Please login.");
-            window.location.href = "index.html";
-        } else {
-            alert(data.message || "Registration failed");
+        if (!response.ok) {
+            alert("Registration failed");
+            return;
         }
+
+        alert("Registration successful. Please login.");
+        window.location.href = "index.html";
+
     } catch (error) {
         console.error(error);
         alert("Backend not reachable");
     }
+}
+
+// ================================
+// LOGOUT
+// ================================
+function logout() {
+    localStorage.clear();
+    window.location.href = "index.html";
 }
