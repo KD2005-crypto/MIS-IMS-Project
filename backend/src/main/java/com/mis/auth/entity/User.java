@@ -10,29 +10,22 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String name;
-
     @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
     private String password;
 
+    // ❗ TEMPORARILY allow NULL to fix DB issue
+    @Column(nullable = true)
+    private String name;
+
+    @Column(nullable = false)
     private String role = "USER";
 
-    // ===== Getters & Setters =====
-
+    // getters & setters
     public Long getId() {
         return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {   // ✅ THIS WAS MISSING
-        this.name = name;
     }
 
     public String getEmail() {
@@ -49,6 +42,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getRole() {
