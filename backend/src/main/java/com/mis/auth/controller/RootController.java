@@ -7,12 +7,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class RootController {
 
     @GetMapping("/")
-    public String health() {
-        return "MIS-IMS Backend is running";
+    public String home() {
+        return "MIS-IMS Backend is running on Render";
     }
 
-    @GetMapping("/favicon.ico")
-    public void favicon() {
-        // prevents 502 from browser favicon request
+    @GetMapping("/health")
+    public String health() {
+        return "OK";
     }
 }
