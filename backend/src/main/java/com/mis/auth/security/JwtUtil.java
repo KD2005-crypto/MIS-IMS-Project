@@ -12,13 +12,9 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    // 🔐 Secret key (HS256)
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private static final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hour
 
-    // ⏱ Token validity: 1 hour
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60;
-
-    // ================= GENERATE TOKEN =================
     public String generateToken(String email, String role) {
         return Jwts.builder()
                 .setSubject(email)
@@ -29,28 +25,24 @@ public class JwtUtil {
                 .compact();
     }
 
-    // ================= VALIDATE TOKEN =================
-    public boolean validateToken(String token) {
+    public String getEmailFromToken(String token) {
+        return getClaims(token).getSubject();
+    }
+
+    public String getRoleFromToken(String token) {
+        return getClaims(token).get("role", String.class);
+    }
+
+    public boolean isTokenValid(String token) {
         try {
-            extractAllClaims(token);
+            getClaims(token);
             return true;
         } catch (Exception e) {
             return false;
         }
     }
 
-    // ================= EXTRACT EMAIL =================
-    public String extractEmail(String token) {
-        return extractAllClaims(token).getSubject();
-    }
-
-    // ================= EXTRACT ROLE =================
-    public String extractRole(String token) {
-        return extractAllClaims(token).get("role", String.class);
-    }
-
-    // ================= INTERNAL =================
-    private Claims extractAllClaims(String token) {
+    private Claims getClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
