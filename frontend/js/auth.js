@@ -1,87 +1,62 @@
-/ ================================
-// CONFIG
-// ================================
-const API_BASE_URL = "https://mis-ims-project-1.onrender.com";
+const BASE_URL = "https://mis-ims-project-1.onrender.com";
 
-// ================================
-// LOGIN
-// ================================
+/* ================= LOGIN ================= */
 async function loginUser(event) {
-    event.preventDefault();
+  event.preventDefault();
 
-    const email = document.getElementById("loginEmail").value;
-    const password = document.getElementById("loginPassword").value;
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
 
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ email, password })
-        });
+  try {
+    const response = await fetch(`${BASE_URL}/api/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email, password })
+    });
 
-        if (!response.ok) {
-            alert("Invalid email or password");
-            return;
-        }
+    const text = await response.text();
 
-        const data = await response.json();
-
-        // Save session
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("role", data.role);
-
-        window.location.href = "dashboard.html";
-
-    } catch (error) {
-        console.error(error);
-        alert("Backend not reachable");
+    if (response.ok) {
+      alert("Login successful");
+      window.location.href = "dashboard.html";
+    } else {
+      alert(text);
     }
+  } catch (error) {
+    alert("Server error. Try again later.");
+    console.error(error);
+  }
 }
 
-// ================================
-// REGISTER
-// ================================
+/* ================= REGISTER ================= */
 async function registerUser(event) {
-    event.preventDefault();
+  event.preventDefault();
 
-    const fullName = document.getElementById("registerName").value;
-    const email = document.getElementById("registerEmail").value;
-    const password = document.getElementById("registerPassword").value;
+  const name = document.getElementById("registerName").value;
+  const email = document.getElementById("registerEmail").value;
+  const password = document.getElementById("registerPassword").value;
 
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                fullName,
-                email,
-                password,
-                role: "USER"
-            })
-        });
+  try {
+    const response = await fetch(`${BASE_URL}/api/auth/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ name, email, password })
+    });
 
-        if (!response.ok) {
-            alert("Registration failed");
-            return;
-        }
+    const text = await response.text();
 
-        alert("Registration successful. Please login.");
-        window.location.href = "index.html";
-
-    } catch (error) {
-        console.error(error);
-        alert("Backend not reachable");
+    if (response.ok) {
+      alert("Registration successful");
+      window.location.href = "index.html";
+    } else {
+      alert(text);
     }
-}
-
-// ================================
-// LOGOUT
-// ================================
-function logout() {
-    localStorage.clear();
-    window.location.href = "index.html";
+  } catch (error) {
+    alert("Server error. Try again later.");
+    console.error(error);
+  }
 }
